@@ -65,7 +65,8 @@ Just ask. The agent picks the tools by itself:
 > What do we already know about the checkout flow?
 
 The first run walks the files and writes pages. Later runs only touch what
-changed — easymem hashes each source file, so unchanged files cost nothing.
+changed — easymem hashes each source file, so a file that stayed the same
+costs nothing.
 
 ## Tools
 
@@ -83,7 +84,7 @@ changed — easymem hashes each source file, so unchanged files cost nothing.
 
 `wiki_guide` is why the wiki comes out the same shape in every client: the
 writing rules ride in a tool result, not in a config file each tool spells
-differently. The package does ship a `SKILL.md`, and it is deliberately thin —
+differently. The package does ship a `SKILL.md`, and it is thin on purpose —
 it says *when* to reach for the wiki and hands the *how* straight back to
 `wiki_guide`.
 
@@ -100,24 +101,24 @@ it says *when* to reach for the wiki and hands the *how* straight back to
 │   └── synthesis/            a conclusion drawn from several pages
 └── .state/
     ├── sources.json          which source files are done, by content hash
-    └── wiki-sources.json     scan bookkeeping
+    └── wiki-sources.json     notes on the last scan
 ```
 
 That is everything. There is no database.
 
 The search index and the link graph are built in memory from the markdown when
-the server starts, and rebuilt on `wiki_reindex`. Nothing is cached, because
-nothing needs to be: the pages **are** the source of truth, and rebuilding is
-about 120 ms for 1,000 pages, 230 ms for 5,000. Queries run in single-digit
-milliseconds.
+the server starts, and built again on `wiki_reindex`. Nothing is kept between
+runs, because nothing needs to be: the pages **are** the source of truth, and
+building them again takes about 120 ms for 1,000 pages, 230 ms for 5,000. A
+search takes a few milliseconds.
 
 Nothing outside `wiki/` is a source of truth. `.state/` holds the content hashes
 that let `wiki_pending` skip files it has already done — the one fact you cannot
-derive from the pages — plus a little scan bookkeeping. Delete `.state/` and the
-next run re-reads every source; nothing is lost but time.
+derive from the pages — plus a few notes on the last scan. Delete `.state/` and
+the next run reads every source again; nothing is lost but time.
 
 Pages are plain markdown with YAML frontmatter. Nothing is locked in — delete
-easymem and you still have a folder of readable notes.
+easymem and you still have a folder of notes anyone can read.
 
 Add to `.gitignore`:
 
