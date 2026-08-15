@@ -15,25 +15,22 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node-version }}
-          cache: pnpm
+          cache: npm
 
       - name: Install
-        run: pnpm install --frozen-lockfile
+        run: npm ci
         env:
           HUSKY: 0
 
       - name: Lint
         if: matrix.node-version == 22
-        run: pnpm run lint
+        run: npm run lint
 
       - name: CI
-        run: pnpm run ci
+        run: npm run ci

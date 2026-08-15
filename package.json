@@ -42,23 +42,22 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "packageManager": "pnpm@11.1.1",
   "scripts": {
     "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
-    "prebuild": "pnpm run clean",
+    "prebuild": "npm run clean",
     "build": "tsc -p tsconfig.build.json",
     "postbuild": "node -e \"require('node:fs').chmodSync('dist/cli.js', 0o755)\"",
-    "prepack": "pnpm run build",
+    "prepack": "npm run build",
     "prepare": "husky",
     "dev": "tsx src/cli.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.js --coverage",
-    "test:unit": "pnpm run test -- --runInBand",
-    "ci": "pnpm run build && pnpm run typecheck && pnpm run test",
-    "validate": "pnpm run lint && pnpm run ci",
-    "validate:release": "pnpm run validate"
+    "test:unit": "npm run test -- --runInBand",
+    "ci": "npm run build && npm run typecheck && npm run test",
+    "validate": "npm run lint && npm run ci",
+    "validate:release": "npm run validate"
   },
   "files": [
     "dist/**/*",

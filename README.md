@@ -128,12 +128,12 @@ Add to `.gitignore`:
 ## Development
 
 ```bash
-pnpm install
-pnpm dev            # run the MCP server over stdio, straight from src
-pnpm lint
-pnpm test           # jest, unit tests with coverage
-pnpm build          # tsc → dist/; dist/cli.js is the published binary
-pnpm ci             # build + typecheck + test, the same thing CI runs
+npm install
+npm run dev      # run the MCP server over stdio, straight from src
+npm run lint
+npm test         # jest, unit tests with coverage
+npm run build    # tsc → dist/; dist/cli.js is the published binary
+npm run ci       # build + typecheck + test, the same thing CI runs
 ```
 
 Requires Node 20 or newer.

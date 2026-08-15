@@ -22,34 +22,31 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           # @semantic-release/npm 13 requires ^22.14 || >=24.10.
           node-version: 24
-          cache: pnpm
+          cache: npm
 
-      # setup-node ships npm 10.x; OIDC trusted publishing needs 11.5.1+.
+      # OIDC trusted publishing needs npm 11.5.1 or newer.
       - name: Upgrade npm
         run: npm install -g npm@latest
 
       - name: Install
-        run: pnpm install --frozen-lockfile
+        run: npm ci
         env:
           HUSKY: 0
 
       - name: Release validation
-        run: pnpm run validate:release
+        run: npm run validate:release
 
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HUSKY: 0
-        run: pnpm exec semantic-release
+        run: npx semantic-release

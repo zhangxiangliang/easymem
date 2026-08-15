@@ -121,12 +121,12 @@ args = ["-y", "easymem"]
 ## 开发
 
 ```bash
-pnpm install
-pnpm dev            # 直接从 src 跑 MCP server，走 stdio
-pnpm lint
-pnpm test           # jest 单元测试，带覆盖率
-pnpm build          # tsc → dist/，dist/cli.js 就是发布的可执行文件
-pnpm ci             # build + typecheck + test，和 CI 跑的完全一样
+npm install
+npm run dev      # 直接从 src 跑 MCP server，走 stdio
+npm run lint
+npm test         # jest 单元测试，带覆盖率
+npm run build    # tsc → dist/，dist/cli.js 就是发布的可执行文件
+npm run ci       # build + typecheck + test，和 CI 跑的完全一样
 ```
 
 需要 Node 20 或更高版本。
