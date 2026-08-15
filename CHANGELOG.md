@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/zhangxiangliang/easymem/compare/v0.2.0...v0.2.1) (2026-08-15)
+
+
+### Bug Fixes
+
+* honour locked pages, and link relatively from index.md ([40eefae](https://github.com/zhangxiangliang/easymem/commit/40eefae00fb875586283d7470f362b73fd6ffd3e))
+
 # [0.2.0](https://github.com/zhangxiangliang/easymem/compare/v0.1.2...v0.2.0) (2026-08-15)
 
 
