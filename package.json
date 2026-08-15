@@ -47,10 +47,12 @@
     "postbuild": "node -e \"require('node:fs').chmodSync('dist/cli.js', 0o755)\"",
     "prepack": "pnpm run build",
     "dev": "tsx src/cli.ts",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
-    "ci": "pnpm run build && pnpm run typecheck",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
+    "ci": "pnpm run build && pnpm run typecheck && pnpm run test",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.js --coverage",
+    "test:unit": "pnpm run test -- --runInBand"
   },
   "files": [
     "dist/**/*"
