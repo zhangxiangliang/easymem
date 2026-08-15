@@ -22,31 +22,33 @@ wiki，不用重读文件。
 提交进 git。easymem 里面没有模型，也没有数据库：agent 负责写，easymem 负责存、
 搜、连。
 
-## 安装
+## 快速开始
 
-不用装任何东西。
+### 交给你的 AI
+
+```bash
+npx skills add zhangxiangliang/easymem
+```
+
+这会把 skill 装进 Claude Code、Cursor、Codex 等工具。之后 AI 会自己把读到的东西
+写进 wiki，下次先搜 wiki，不用把文件再读一遍。
+
+不想装 CLI？把下面这句话丢给你的 AI，剩下的它自己搞定：
+
+> Read and follow https://github.com/zhangxiangliang/easymem/blob/main/SKILL.md
+
+### 命令行
+
+不用装，`npx` 第一次运行会自动拉包。
 
 ```bash
 npx easymem search "结算流程是怎么走的"
 npx easymem --help
 ```
 
-给 agent 装上 skill，它就知道什么时候该想到 wiki：
+### 接成 MCP server
 
-```bash
-npx skills add zhangxiangliang/easymem
-```
-
-走的是 [vercel-labs/skills](https://github.com/vercel-labs/skills)，它会自动
-识别你用的是哪个 agent，把文件放到对应的目录。不想多装一个工具的话，skill 文件
-本来就在包里：
-
-```bash
-mkdir -p .claude/skills/easymem
-npx easymem skill > .claude/skills/easymem/SKILL.md
-```
-
-想接成 MCP server（索引常驻内存，长会话更划算），加上这段然后重启：
+索引常驻内存，长会话更划算。加上这段然后重启：
 
 ```json
 {

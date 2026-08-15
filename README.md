@@ -23,32 +23,34 @@ Everything lands in plain markdown you can read, edit and commit. There is no
 model inside easymem and no database: the agent writes, easymem stores, searches
 and links.
 
-## Install
+## Quick start
 
-Nothing to install.
+### With your AI
+
+```bash
+npx skills add zhangxiangliang/easymem
+```
+
+That installs the skill into Claude Code, Cursor, Codex and other agents. From
+then on the AI writes down what it reads and searches the wiki first, instead of
+reading your files again.
+
+No CLI? Hand your AI this line instead, and it does the rest:
+
+> Read and follow https://github.com/zhangxiangliang/easymem/blob/main/SKILL.md
+
+### On the command line
+
+No install needed. `npx` gets the package on first run.
 
 ```bash
 npx easymem search "how does checkout work"
 npx easymem --help
 ```
 
-Give your agent the skill, so it knows when to reach for the wiki:
+### As an MCP server
 
-```bash
-npx skills add zhangxiangliang/easymem
-```
-
-That goes through [vercel-labs/skills](https://github.com/vercel-labs/skills),
-which detects your agent and puts the file where that agent looks. The file also
-ships in the package, if you would rather not add a tool:
-
-```bash
-mkdir -p .claude/skills/easymem
-npx easymem skill > .claude/skills/easymem/SKILL.md
-```
-
-To run it as an MCP server instead — the index stays warm between calls — add
-this and restart:
+The index stays warm between calls. Add this and restart:
 
 ```json
 {

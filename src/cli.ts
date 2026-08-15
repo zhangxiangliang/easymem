@@ -16,8 +16,8 @@
  * thousand pages — where the server keeps it warm.
  */
 
-import { COMMANDS, help, parse } from "./cli-args.js";
-import { createContext, main as startServer, parseDir, runTool } from "./mcp.js";
+import { COMMANDS, emptyWikiHint, help, parse } from "./cli-args.js";
+import { createContext, isWikiEmpty, main as startServer, parseDir, runTool } from "./mcp.js";
 import { VERSION } from "./version.js";
 
 async function run(argv: string[]): Promise<number> {
@@ -58,9 +58,13 @@ async function run(argv: string[]): Promise<number> {
     return 0;
   }
 
-  const ctx = createContext(parseDir(argv), process.cwd());
+  const dir = parseDir(argv);
+  const ctx = createContext(dir, process.cwd());
   const out = runTool(command.tool!, command.args(positional.slice(1), flags), ctx);
   console.log(typeof out === "string" ? out : JSON.stringify(out, null, 2));
+
+  // On stderr, so stdout stays valid JSON for whatever is reading it.
+  if (command.hintWhenEmpty && isWikiEmpty(ctx)) console.error(`\n${emptyWikiHint(dir)}`);
   return 0;
 }
 

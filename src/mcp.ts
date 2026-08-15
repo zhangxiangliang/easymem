@@ -373,6 +373,17 @@ export function createContext(dir: string, root: string): Ctx {
   return { dir, root, mgr };
 }
 
+/**
+ * Whether the wiki holds no knowledge yet — empty, or only the generated index.
+ *
+ * A first run returns `{"results": [], "count": 0}`, which reads the same as a
+ * query that found nothing. The caller needs to be able to tell those apart
+ * before it concludes the wiki is useless.
+ */
+export function isWikiEmpty(ctx: Ctx): boolean {
+  return ctx.mgr.getPages(WIKI).every((p) => STRUCTURAL_TYPES.has(p.type));
+}
+
 /** Every tool, with the description the MCP client and `--help` both show. */
 export function toolCatalog(): Array<{ name: string; description: string }> {
   return TOOLS.map((t) => ({ name: t.name, description: t.description }));

@@ -23,6 +23,8 @@ export interface Command {
   tool?: string;
   /** For a command with no tool: what to print. */
   print?: () => string;
+  /** Read commands say so when there is nothing to read yet. */
+  hintWhenEmpty?: true;
   /** Usage line shown by --help. */
   usage: string;
   summary: string;
@@ -55,6 +57,25 @@ export function parse(argv: string[]): { positional: string[]; flags: Flags } {
 /** A comma-separated flag, or an empty list. `--sources a.ts,b.ts` */
 export function commaList(value: string | undefined): string[] {
   return (value ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+}
+
+/**
+ * What to say when a read command finds no pages.
+ *
+ * The README opens by telling people to run `easymem search`, and on a fresh
+ * project that returned `{"results": [], "count": 0}` — the same answer a real
+ * miss gives. The first instruction in the documentation led straight into a
+ * dead end, so the dead end has to explain itself.
+ */
+export function emptyWikiHint(dir: string): string {
+  return [
+    `No pages in ${dir} yet.`,
+    "",
+    "Build the wiki — ask your agent:",
+    '  "Read everything under src/ and docs/, and build the wiki."',
+    "",
+    "The rules it will follow:  easymem guide",
+  ].join("\n");
 }
 
 /**
@@ -103,6 +124,7 @@ export const COMMANDS: Command[] = [
   {
     name: "search",
     tool: "wiki_search",
+    hintWhenEmpty: true,
     usage: 'search <query> [--limit N] [--hop N]',
     summary: "Full-text search, then one hop along [[links]]. Do this before grep.",
     args: (rest, flags) => {
@@ -118,6 +140,7 @@ export const COMMANDS: Command[] = [
   {
     name: "list",
     tool: "wiki_list",
+    hintWhenEmpty: true,
     usage: "list [--type TYPE]",
     summary: "Every page: id, title, type, path, sources.",
     args: (_rest, flags) => ({ type: flags.get("type") }),
@@ -135,6 +158,7 @@ export const COMMANDS: Command[] = [
   {
     name: "graph",
     tool: "wiki_graph",
+    hintWhenEmpty: true,
     usage: "graph",
     summary: "The whole link graph — hubs to start from, orphans to fix.",
     args: () => ({}),
@@ -142,6 +166,7 @@ export const COMMANDS: Command[] = [
   {
     name: "lint",
     tool: "wiki_lint",
+    hintWhenEmpty: true,
     usage: "lint",
     summary: "Find what has rotted: dead links, orphans, and pages their sources have outgrown.",
     args: () => ({}),
