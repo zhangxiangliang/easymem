@@ -2,7 +2,7 @@
 
 [English](./README.md) · 简体中文
 
-给你的代码库配一个本地 wiki，以 **MCP server** 的形式提供。不要 API key，不上云，不用第二个模型。
+给你的代码库配一个本地 wiki。用 `npx` 在命令行直接跑，或者接成 **MCP server**。不要 API key，不上云，不用第二个模型。
 
 页面由你本来就在用的编码 agent 来写 —— Claude Code、Codex、opencode。
 easymem 负责存下来、建索引、连成图。
@@ -21,7 +21,18 @@ easymem 里面没有模型。**MCP 管道另一端的 agent 就是模型。** �
 
 ## 安装
 
-在 agent 的 MCP 配置里加一段就行，没有别的要设置的。
+不用装任何东西。进到一个项目里直接问：
+
+```bash
+npx easymem search "结算流程是怎么走的"
+npx easymem list
+npx easymem guide          # agent 写页面时遵循的规则
+npx easymem --help
+```
+
+每个子命令都输出 JSON，能和任何东西组合。**只要 agent 会执行 shell 命令，它就能用上整个 wiki，零配置。**
+
+**也可以接成 MCP。** 两边工具完全相同；服务器模式会把索引常驻内存，长会话、大 wiki 时更划算。`npx` 每次重建索引 —— 一千个页面大约 200 ms。
 
 **Claude Code** —— 项目根目录的 `.mcp.json`：
 
@@ -66,17 +77,19 @@ args = ["-y", "easymem"]
 
 ## 工具
 
-| 工具 | 做什么 |
-| --- | --- |
-| `wiki_search` | 全文搜索，然后顺着 `[[链接]]` 走一层，相关页面也会一起浮出来 |
-| `wiki_read` | 读一个页面 |
-| `wiki_list` | 列出所有页面：id、标题、类型、路径 |
-| `wiki_graph` | 整张链接图 —— 找出枢纽页和孤儿页 |
-| `wiki_guide` | 写作规则，运行时直接交给 agent |
-| `wiki_pending` | 上次之后哪些源文件是新的或改过的 |
-| `wiki_write` | 写一个页面 |
-| `wiki_delete` | 删一个页面 |
-| `wiki_reindex` | 重建索引、链接图和 `index.md` |
+| 命令行 | MCP 工具 | 做什么 |
+| --- | --- | --- |
+| `easymem search` | `wiki_search` | 全文搜索，然后顺着 `[[链接]]` 走一层，相关页面也会一起浮出来 |
+| `easymem read` | `wiki_read` | 读一个页面 |
+| `easymem list` | `wiki_list` | 列出所有页面：id、标题、类型、路径 |
+| `easymem graph` | `wiki_graph` | 整张链接图 —— 找出枢纽页和孤儿页 |
+| `easymem guide` | `wiki_guide` | 写作规则，运行时直接交给 agent |
+| `easymem pending` | `wiki_pending` | 上次之后哪些源文件是新的或改过的 |
+| `easymem write` | `wiki_write` | 写一个页面 |
+| `easymem delete` | `wiki_delete` | 删一个页面 |
+| `easymem reindex` | `wiki_reindex` | 重建索引、链接图和 `index.md` |
+
+每一行是同一份实现的两个入口，所以命令行和 MCP 不可能给出不同的答案。
 
 `wiki_guide` 是这个 wiki 在每个客户端里都长成同一个形状的原因：写作规则跟着
 工具返回值走，而不是放在一个每个工具叫法都不同的配置文件里。包里确实带了一个

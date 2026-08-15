@@ -323,18 +323,42 @@ const TOOLS: ToolDef[] = [
   },
 ];
 
-// ───────────────────────── server ─────────────────────────
+// ───────────────────────── shared entry points ─────────────────────────
 
-function parseDir(argv: string[]): string {
+/** Where the wiki lives: `--dir`, else EASYMEM_DIR, else `.easymem`. */
+export function parseDir(argv: string[]): string {
   const i = argv.indexOf("--dir");
   const raw = i >= 0 && argv[i + 1] ? argv[i + 1] : process.env.EASYMEM_DIR || ".easymem";
   return resolve(process.cwd(), raw);
 }
 
-export function createEasymemServer(dir: string, root: string): Server {
+/**
+ * Open the wiki at `dir`, creating the directory tree on first run.
+ *
+ * Both front ends build one of these and then call `runTool`. Keeping the
+ * behaviour in one place is the point: a subcommand and a tool call with the
+ * same arguments must not be able to do different things.
+ */
+export function createContext(dir: string, root: string): Ctx {
   const mgr = createWikiSourceManager(join(dir, ".state"));
   mgr.init({ name: WIKI, path: dir }); // creates the wiki/ tree on first run, idempotent
-  const ctx: Ctx = { dir, root, mgr };
+  return { dir, root, mgr };
+}
+
+/** Every tool, with the description the MCP client and `--help` both show. */
+export function toolCatalog(): Array<{ name: string; description: string }> {
+  return TOOLS.map((t) => ({ name: t.name, description: t.description }));
+}
+
+/** Run one tool by name. Throws if the name is unknown or the tool throws. */
+export function runTool(name: string, args: Record<string, unknown>, ctx: Ctx): unknown {
+  const tool = TOOLS.find((t) => t.name === name);
+  if (!tool) throw new Error(`unknown tool: ${name}`);
+  return tool.run(args, ctx);
+}
+
+export function createEasymemServer(dir: string, root: string): Server {
+  const ctx = createContext(dir, root);
 
   const byName = new Map(TOOLS.map((t) => [t.name, t]));
   const server = new Server(

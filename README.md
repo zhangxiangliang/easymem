@@ -2,7 +2,7 @@
 
 English · [简体中文](./README.zh.md)
 
-A local wiki for your codebase, served as an **MCP server**. No API key, no cloud, no second model.
+A local wiki for your codebase. Use it from a shell with `npx`, or connect it as an **MCP server**. No API key, no cloud, no second model.
 
 The coding agent you already run — Claude Code, Codex, opencode — writes the pages.
 easymem keeps them, indexes them, and links them.
@@ -23,7 +23,21 @@ compile. `npx` either works or your network is down.
 
 ## Install
 
-Add one block to your agent's MCP config. There is nothing else to set up.
+There is nothing to install. Point it at a project and ask:
+
+```bash
+npx easymem search "how does checkout work"
+npx easymem list
+npx easymem guide          # the rules an agent follows when writing pages
+npx easymem --help
+```
+
+Every subcommand prints JSON, so it composes with anything. An agent that can
+run a shell command can use the whole wiki, with no configuration at all.
+
+**Or connect it over MCP.** The tools are the same either way; a server keeps
+the index warm between calls, which is worth it for a long session over a large
+wiki. `npx` rebuilds it each run — about 200 ms for a thousand pages.
 
 **Claude Code** — `.mcp.json` in the project root:
 
@@ -70,17 +84,20 @@ costs nothing.
 
 ## Tools
 
-| Tool | What it does |
-| --- | --- |
-| `wiki_search` | Full-text search, then follows `[[links]]` so related pages surface too |
-| `wiki_read` | Read one page |
-| `wiki_list` | Every page: id, title, type, path |
-| `wiki_graph` | The whole link graph — find hubs and orphans |
-| `wiki_guide` | The writing rules, handed to the agent at run time |
-| `wiki_pending` | Which source files are new or changed since last time |
-| `wiki_write` | Write one page |
-| `wiki_delete` | Delete one page |
-| `wiki_reindex` | Rebuild the index, the graph and `index.md` |
+| Shell | MCP tool | What it does |
+| --- | --- | --- |
+| `easymem search` | `wiki_search` | Full-text search, then follows `[[links]]` so related pages surface too |
+| `easymem read` | `wiki_read` | Read one page |
+| `easymem list` | `wiki_list` | Every page: id, title, type, path |
+| `easymem graph` | `wiki_graph` | The whole link graph — find hubs and orphans |
+| `easymem guide` | `wiki_guide` | The writing rules, handed to the agent at run time |
+| `easymem pending` | `wiki_pending` | Which source files are new or changed since last time |
+| `easymem write` | `wiki_write` | Write one page |
+| `easymem delete` | `wiki_delete` | Delete one page |
+| `easymem reindex` | `wiki_reindex` | Rebuild the index, the graph and `index.md` |
+
+Each row is one implementation with two front ends, so the shell and MCP cannot
+answer differently.
 
 `wiki_guide` is why the wiki comes out the same shape in every client: the
 writing rules ride in a tool result, not in a config file each tool spells
