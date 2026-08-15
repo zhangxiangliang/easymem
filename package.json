@@ -1,6 +1,6 @@
 {
   "name": "easymem",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "An LLM wiki your coding agent writes — agent memory you can open and read. The agent does the writing; easymem does the storage, full-text search and knowledge graph. No embedding model, no vector database.",
   "author": "zhangxiangliang",
   "keywords": [

@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/zhangxiangliang/easymem/compare/v0.3.1...v0.4.0) (2026-08-15)
+
+
+### Features
+
+* say so when the wiki is empty ([ad9fec9](https://github.com/zhangxiangliang/easymem/commit/ad9fec9d39d76691e91242a1dc7c796e06e83ad2))
+
 ## [0.3.1](https://github.com/zhangxiangliang/easymem/compare/v0.3.0...v0.3.1) (2026-08-15)
 
 
