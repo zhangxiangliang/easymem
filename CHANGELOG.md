@@ -1,3 +1,10 @@
+# [0.2.0](https://github.com/zhangxiangliang/easymem/compare/v0.1.2...v0.2.0) (2026-08-15)
+
+
+### Features
+
+* use the wiki from a shell, without configuring MCP ([2c1caa5](https://github.com/zhangxiangliang/easymem/commit/2c1caa5e418f7bbb1a9611be3d52fc1a9cef6137))
+
 ## [0.1.2](https://github.com/zhangxiangliang/easymem/compare/v0.1.1...v0.1.2) (2026-08-15)
 
 
