@@ -14,8 +14,15 @@ import { VERSION } from "./version.js";
 export interface Command {
   /** Subcommand name, as typed. */
   name: string;
-  /** The MCP tool it calls. */
-  tool: string;
+  /**
+   * The MCP tool it calls, or absent for a command that is not a wiki
+   * operation. Only `skill` is in that group: installing a skill file is
+   * something a person does to their agent, and putting it in the tool list
+   * would offer an MCP client a tool it can never have a use for.
+   */
+  tool?: string;
+  /** For a command with no tool: what to print. */
+  print?: () => string;
   /** Usage line shown by --help. */
   usage: string;
   summary: string;
@@ -50,6 +57,18 @@ export function commaList(value: string | undefined): string[] {
   return (value ?? "").split(",").map((s) => s.trim()).filter(Boolean);
 }
 
+/**
+ * The packaged SKILL.md.
+ *
+ * Shipping it through the CLI rather than telling people to download it means
+ * the file always matches the installed version, works offline, and cannot rot
+ * against a URL. `../SKILL.md` resolves to the package root from both
+ * dist/cli-args.js and src/ under tsx.
+ */
+export function readSkill(): string {
+  return readFileSync(new URL("../SKILL.md", import.meta.url), "utf-8");
+}
+
 /** Body text from --body, --body-file, or piped stdin. */
 export function readBody(flags: Flags): string {
   const inline = flags.get("body");
@@ -67,6 +86,13 @@ export function readBody(flags: Flags): string {
 }
 
 export const COMMANDS: Command[] = [
+  {
+    name: "skill",
+    usage: "skill",
+    summary: "Print the agent skill file, to save into your agent's skills directory.",
+    print: readSkill,
+    args: () => ({}),
+  },
   {
     name: "guide",
     tool: "wiki_guide",

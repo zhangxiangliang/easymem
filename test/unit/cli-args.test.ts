@@ -57,8 +57,23 @@ describe("every subcommand maps to a real tool", () => {
   // cannot leave this check quietly out of date.
   const toolNames = new Set(toolCatalog().map((t) => t.name));
 
-  it.each(COMMANDS.map((c) => [c.name, c.tool]))("%s → %s", (_name, tool) => {
-    expect(toolNames.has(tool as string)).toBe(true);
+  it.each(COMMANDS.filter((c) => c.tool).map((c) => [c.name, c.tool]))(
+    "%s → %s",
+    (_name, tool) => {
+      expect(toolNames.has(tool as string)).toBe(true);
+    },
+  );
+
+  it("gives a command without a tool something to print instead", () => {
+    for (const command of COMMANDS.filter((c) => !c.tool)) {
+      expect(typeof command.print).toBe("function");
+    }
+  });
+
+  it("prints a skill file with the frontmatter an agent needs", () => {
+    const skill = COMMANDS.find((c) => c.name === "skill")!.print!();
+    expect(skill).toMatch(/^---\nname: easymem\n/);
+    expect(skill).toContain("description:");
   });
 
   it("has no duplicate names", () => {

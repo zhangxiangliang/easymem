@@ -51,8 +51,15 @@ async function run(argv: string[]): Promise<number> {
     return 1;
   }
 
+  // A command with no tool prints something and touches no wiki, so it must
+  // not create one as a side effect of being run in the wrong directory.
+  if (command.print) {
+    console.log(command.print());
+    return 0;
+  }
+
   const ctx = createContext(parseDir(argv), process.cwd());
-  const out = runTool(command.tool, command.args(positional.slice(1), flags), ctx);
+  const out = runTool(command.tool!, command.args(positional.slice(1), flags), ctx);
   console.log(typeof out === "string" ? out : JSON.stringify(out, null, 2));
   return 0;
 }
