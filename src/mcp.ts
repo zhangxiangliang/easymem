@@ -31,7 +31,7 @@ import {
   type SourceMap,
 } from "./wiki/sources.js";
 import { pageRelPath } from "./wiki/slug.js";
-import { buildPage } from "./wiki/frontmatter.js";
+import { buildPage, isLocked } from "./wiki/frontmatter.js";
 import { rebuildIndexFile } from "./wiki/index-builder.js";
 import { INGEST_GUIDE } from "./wiki/guide.js";
 import { createLogger } from "./logger.js";
@@ -196,8 +196,9 @@ const TOOLS: ToolDef[] = [
     name: "wiki_write",
     description:
       "Write one wiki page. Overwrites a page with the same type+title, so read it first and merge " +
-      "rather than dropping what is there. Call wiki_reindex when you have finished a batch — " +
-      "search does not see the page until you do.",
+      "rather than dropping what is there. A page whose frontmatter says locked: true was pinned " +
+      "by a human and is never overwritten — the call returns action: skipped-locked. " +
+      "Call wiki_reindex when you have finished a batch — search does not see the page until you do.",
     inputSchema: {
       type: "object",
       properties: {
@@ -229,6 +230,13 @@ const TOOLS: ToolDef[] = [
       if (!full.startsWith(join(ctx.dir, "wiki"))) throw new Error(`refusing to write outside wiki/: ${relPath}`);
 
       const existed = existsSync(full);
+      // `locked: true` is a human pinning a page by hand. Honouring it is the
+      // whole reason the mark exists — without this check the flag was
+      // documented, parsed by isLocked(), and then ignored.
+      if (existed && isLocked(readFileSync(full, "utf-8"))) {
+        return { path: relPath, action: "skipped-locked" };
+      }
+
       const content = buildPage(
         {
           type,

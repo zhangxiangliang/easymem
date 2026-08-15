@@ -29,9 +29,15 @@ const GROUP_ORDER: Array<{ type: string; heading: string }> = [
   { type: "synthesis", heading: "Synthesis" },
 ];
 
-interface IndexEntry {
+export interface IndexEntry {
   title: string;
-  relPath: string; // wiki-relative, leading slash
+  /**
+   * Relative to index.md, which sits in the same `wiki/` directory — so
+   * `entities/order-service.md`, never `/entities/order-service.md`. A leading
+   * slash resolves to the root of the repository or the site, so every link in
+   * the generated index would be dead on GitHub and in an editor alike.
+   */
+  relPath: string;
   description: string;
   type: string;
 }
@@ -74,7 +80,7 @@ function collectEntries(wikiDir: string): IndexEntry[] {
           : entry.replace(/\.md$/, "");
       const description =
         typeof frontmatter.description === "string" ? frontmatter.description.trim() : "";
-      out.push({ title, relPath: `/${rel}`, description, type: frontmatter.type });
+      out.push({ title, relPath: rel, description, type: frontmatter.type });
     }
   };
   if (existsSync(wikiDir)) walk(wikiDir);
