@@ -1,6 +1,6 @@
 {
   "name": "easymem",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A local LLM-wiki as an MCP server. The coding agent you already run does the writing; easymem does the storage, full-text search and knowledge graph. No API key.",
   "author": "zhangxiangliang",
   "keywords": [

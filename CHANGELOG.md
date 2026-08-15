@@ -1,3 +1,10 @@
+## [0.3.1](https://github.com/zhangxiangliang/easymem/compare/v0.3.0...v0.3.1) (2026-08-15)
+
+
+### Bug Fixes
+
+* read links from prose, not from code, and never suggest the index ([2a2014b](https://github.com/zhangxiangliang/easymem/commit/2a2014b1991503007b0466bc1c4649ff6fded914))
+
 # [0.3.0](https://github.com/zhangxiangliang/easymem/compare/v0.2.1...v0.3.0) (2026-08-15)
 
 
