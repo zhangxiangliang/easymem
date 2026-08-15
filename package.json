@@ -42,6 +42,7 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "packageManager": "pnpm@11.1.1",
   "scripts": {
     "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
     "prebuild": "pnpm run clean",
