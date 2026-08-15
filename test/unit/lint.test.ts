@@ -79,6 +79,27 @@ describe("links", () => {
     expect(lint(pages, NO_SOURCES, "/nope").missingLinks).toEqual([]);
   });
 
+  it("does not read a mention inside code as prose", () => {
+    // A page about the page format quotes `sources` and `index.md` constantly.
+    // Counting those as prose asked it to link a page for every quoted word.
+    const pages = [
+      page("Alpha", "The frontmatter key is `Payment Gateway` in code, not prose.", {
+        sources: ["a.ts"],
+      }),
+      page("Payment Gateway", "See [[Alpha]].", { sources: ["b.ts"] }),
+    ];
+    expect(lint(pages, NO_SOURCES, "/nope").missingLinks).toEqual([]);
+  });
+
+  it("does not suggest linking a structural page", () => {
+    const pages = [
+      page("Alpha", "Rebuilding the index is cheap. [[Beta]] agrees.", { sources: ["a.ts"] }),
+      page("Beta", "See [[Alpha]].", { sources: ["b.ts"] }),
+      page("Index", "# Index", { type: "index" }),
+    ];
+    expect(lint(pages, NO_SOURCES, "/nope").missingLinks).toEqual([]);
+  });
+
   it("ignores titles too short to mean anything", () => {
     const pages = [
       page("Alpha", "The id is everywhere in this text.", { sources: ["a.ts"] }),

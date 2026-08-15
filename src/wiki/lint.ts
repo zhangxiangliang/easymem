@@ -47,9 +47,20 @@ export interface LintReport {
   summary: Record<string, number>;
 }
 
-/** Text with every `[[link]]` removed, so a mention inside one does not count. */
+/**
+ * Text with links and code removed, so neither counts as a plain mention.
+ *
+ * Code matters as much as links here: a page explaining the format quotes
+ * `type` and `sources` and `index.md` constantly, and every one of those would
+ * read as prose naming another page.
+ */
 function prose(page: WikiPage): string {
-  return page.content.replace(/\[\[[^\]]*\]\]/g, " ").toLowerCase();
+  return page.content
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/~~~[\s\S]*?~~~/g, " ")
+    .replace(/`[^`\n]*`/g, " ")
+    .replace(/\[\[[^\]]*\]\]/g, " ")
+    .toLowerCase();
 }
 
 /**
@@ -127,10 +138,13 @@ export function lint(pages: WikiPage[], known: SourceMap, sourceRoot: string): L
   }
 
   const missingLinks: LintReport["missingLinks"] = [];
-  for (const page of pages) {
-    if (STRUCTURAL_TYPES.has(page.type)) continue;
+  const linkable = pages.filter((p) => !STRUCTURAL_TYPES.has(p.type));
+  for (const page of linkable) {
     const text = prose(page);
-    for (const other of pages) {
+    // Only real pages are worth suggesting. The generated index is titled
+    // "Index", and without this every page that says "the index" was told to
+    // link to a page nobody should ever link to.
+    for (const other of linkable) {
       if (other.relPath === page.relPath) continue;
       const title = other.title.trim().toLowerCase();
       // Two characters is noise in both languages — it would flag every page

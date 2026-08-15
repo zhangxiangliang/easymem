@@ -68,14 +68,28 @@ function extractFrontmatter(content: string): { title: string; type: string; sou
   };
 }
 
+/**
+ * Every `[[target]]` in a page, deduplicated, ignoring anything inside code.
+ *
+ * Code has to be stripped first or a page that documents the link syntax links
+ * to it. Writing `` `[[Page Title]]` `` in a sentence about how linking works
+ * produced an edge to a page called "Page Title", and a dangling-link report
+ * pointing at prose that was never a link.
+ */
 function extractWikilinks(content: string): string[] {
-  const links: string[] = [];
+  const prose = content
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/~~~[\s\S]*?~~~/g, " ")
+    .replace(/`[^`\n]*`/g, " ");
+
+  const links = new Set<string>();
   const regex = /\[\[([^\]|]+?)(?:\|[^\]]+?)?\]\]/g;
   let match: RegExpExecArray | null;
-  while ((match = regex.exec(content)) !== null) {
-    links.push(match[1].trim());
+  while ((match = regex.exec(prose)) !== null) {
+    const target = match[1]!.trim();
+    if (target) links.add(target);
   }
-  return links;
+  return [...links];
 }
 
 // ── Manager Interface ──

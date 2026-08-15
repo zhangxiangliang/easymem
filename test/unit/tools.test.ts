@@ -150,6 +150,31 @@ describe("the wiki loop", () => {
     expect(call<Array<{ title: string }>>("wiki_list").map((p) => p.title)).toEqual(["Alpha"]);
   });
 
+  it("does not treat a link inside code as a link", () => {
+    // Found by running easymem over its own source: a page explaining the
+    // syntax wrote `[[Page Title]]` in backticks, and got an edge to a page
+    // called "Page Title" plus a dangling-link report about its own prose.
+    write("Docs", "concept", "Write a link as `[[Some Page]]`.\n\n```\n[[Fenced Page]]\n```");
+    write("Real", "concept", "Points at [[Docs]].");
+    call("wiki_reindex", { ingested: [] });
+
+    const report = call<{ danglingLinks: unknown[] }>("wiki_lint");
+    expect(report.danglingLinks).toEqual([]);
+
+    const graph = call<{ edges: unknown[] }>("wiki_graph");
+    expect(graph.edges).toHaveLength(1); // Real → Docs, and nothing from the code
+  });
+
+  it("never asks a page to link the generated index", () => {
+    // "the index" appears in almost every page of a wiki about an index.
+    write("Alpha", "concept", "Rebuilding the index is cheap. [[Beta]] agrees.");
+    write("Beta", "concept", "See [[Alpha]].");
+    call("wiki_reindex", { ingested: [] });
+
+    const report = call<{ missingLinks: Array<{ shouldLink: string }> }>("wiki_lint");
+    expect(report.missingLinks.map((m) => m.shouldLink)).not.toContain("Index");
+  });
+
   it("builds a graph of the pages and their links", () => {
     write("Alpha", "entity", "Links to [[Beta]].");
     write("Beta", "entity", "Links back to [[Alpha]].");
