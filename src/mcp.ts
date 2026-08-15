@@ -376,12 +376,3 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
   await server.connect(new StdioServerTransport());
   log.info("connected over stdio");
 }
-
-// `tsx src/mcp.ts` during development. The published binary imports main()
-// from bin/easywiki.mjs instead, so this guard stays false there.
-if (process.argv[1] !== undefined && import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((err) => {
-    log.error("failed to start", { error: err instanceof Error ? err.message : String(err) });
-    process.exit(1);
-  });
-}
