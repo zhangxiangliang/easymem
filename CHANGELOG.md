@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/zhangxiangliang/easymem/compare/v0.2.1...v0.3.0) (2026-08-15)
+
+
+### Features
+
+* find where the wiki has stopped being true ([c72e69f](https://github.com/zhangxiangliang/easymem/commit/c72e69f73c4b6c392965abc2aa8e312e7033a1a8))
+
 ## [0.2.1](https://github.com/zhangxiangliang/easymem/compare/v0.2.0...v0.2.1) (2026-08-15)
 
 
