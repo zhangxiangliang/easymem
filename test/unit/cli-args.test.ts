@@ -72,7 +72,9 @@ describe("every subcommand maps to a real tool", () => {
 
   it("prints a skill file with the frontmatter an agent needs", () => {
     const skill = COMMANDS.find((c) => c.name === "skill")!.print!();
-    expect(skill).toMatch(/^---\nname: easymem\n/);
+    // The name is what `skills find` matches on, so it carries the words
+    // someone would search for. `easymem` matched neither "wiki" nor "llm".
+    expect(skill).toMatch(/^---\nname: easy-llm-wiki\n/);
     expect(skill).toContain("description:");
   });
 

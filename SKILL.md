@@ -1,5 +1,5 @@
 ---
-name: easymem
+name: easy-llm-wiki
 description: Search the project's wiki before reading source files, and write back what you work out. Use it when you need to know what this project already knows — how a service works, why a decision was made, what a term means — or when you have just figured something out that the next session should not have to figure out again. Runs with npx, nothing to install.
 ---
 
