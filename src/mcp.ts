@@ -15,6 +15,11 @@
 import { existsSync, readFileSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
 
+// `Server` is marked deprecated in favour of `McpServer`, but the deprecation
+// says "only use Server for advanced use cases" — and this is one. The tool
+// table is a plain array that the CLI walks too, so both front ends run the
+// same code; McpServer's registerTool() would own that registry instead and
+// split them apart. Deliberate, not an oversight.
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
