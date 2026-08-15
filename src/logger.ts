@@ -9,7 +9,7 @@
 type Level = "debug" | "info" | "warn" | "error";
 
 const LEVEL_PRIORITY: Record<Level, number> = { debug: 0, info: 1, warn: 2, error: 3 };
-const LOG_LEVEL = (process.env.EASYWIKI_LOG_LEVEL || "warn") as Level;
+const LOG_LEVEL = (process.env.EASYMEM_LOG_LEVEL || "warn") as Level;
 
 function ts() {
   return new Date().toISOString().replace("T", " ").slice(0, 23);

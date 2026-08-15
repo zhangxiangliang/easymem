@@ -1,11 +1,11 @@
 /**
- * easywiki — MCP stdio server.
+ * easymem — MCP stdio server.
  *
  * One process, no HTTP, no API key. The wiki lives in a plain directory:
  * markdown pages under `<dir>/wiki/`, nothing else. The search index and the
  * link graph are built in memory at startup — there is no database file.
  *
- *   easywiki [--dir <path>]        # or EASYWIKI_DIR
+ *   easymem [--dir <path>]        # or EASYMEM_DIR
  *
  * Read tools (search / read / list / graph) answer from the index.
  * Write tools (guide / pending / write / reindex) let the connected agent
@@ -36,7 +36,7 @@ import { rebuildIndexFile } from "./wiki/index-builder.js";
 import { INGEST_GUIDE } from "./wiki/guide.js";
 import { createLogger } from "./logger.js";
 
-const log = createLogger("easywiki");
+const log = createLogger("easymem");
 
 /** Single wiki per directory — the name is internal, never user-facing. */
 const WIKI = "wiki";
@@ -208,7 +208,7 @@ const TOOLS: ToolDef[] = [
         body: {
           type: "string",
           description:
-            "Markdown body, no frontmatter — easywiki adds it. Link related pages with [[Title]].",
+            "Markdown body, no frontmatter — easymem adds it. Link related pages with [[Title]].",
         },
         sources: {
           type: "array",
@@ -326,18 +326,18 @@ const TOOLS: ToolDef[] = [
 
 function parseDir(argv: string[]): string {
   const i = argv.indexOf("--dir");
-  const raw = i >= 0 && argv[i + 1] ? argv[i + 1] : process.env.EASYWIKI_DIR || ".easywiki";
+  const raw = i >= 0 && argv[i + 1] ? argv[i + 1] : process.env.EASYMEM_DIR || ".easymem";
   return resolve(process.cwd(), raw);
 }
 
-export function createEasywikiServer(dir: string, root: string): Server {
+export function createEasymemServer(dir: string, root: string): Server {
   const mgr = createWikiSourceManager(join(dir, ".state"));
   mgr.init({ name: WIKI, path: dir }); // creates the wiki/ tree on first run, idempotent
   const ctx: Ctx = { dir, root, mgr };
 
   const byName = new Map(TOOLS.map((t) => [t.name, t]));
   const server = new Server(
-    { name: "easywiki", version: "0.1.0" },
+    { name: "easymem", version: "0.1.0" },
     { capabilities: { tools: {} } },
   );
 
@@ -373,7 +373,7 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
   const dir = parseDir(argv);
   const root = process.cwd();
   log.info("starting", { dir, root });
-  const server = createEasywikiServer(dir, root);
+  const server = createEasymemServer(dir, root);
   await server.connect(new StdioServerTransport());
   log.info("connected over stdio");
 }

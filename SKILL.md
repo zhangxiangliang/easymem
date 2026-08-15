@@ -1,11 +1,11 @@
 ---
-name: easywiki
+name: easymem
 description: Look things up in the project wiki before reading source files, and file what you learn back into it. Use it when you need to know what this project already knows — how a service works, why a decision was made, what a term means — or when you have just worked something out that the next session should not have to work out again.
 ---
 
-# easywiki
+# easymem
 
-The project has a wiki, served over MCP by `easywiki`. It is compiled knowledge:
+The project has a wiki, served over MCP by `easymem`. It is compiled knowledge:
 pages an agent wrote after reading the sources, so you do not have to read them
 again.
 

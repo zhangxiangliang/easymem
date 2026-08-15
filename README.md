@@ -1,11 +1,11 @@
-# easywiki
+# easymem
 
 English · [简体中文](./README.zh.md)
 
 A local wiki for your codebase, served as an **MCP server**. No API key, no cloud, no second model.
 
 The coding agent you already run — Claude Code, Codex, opencode — writes the pages.
-easywiki keeps them, indexes them, and links them.
+easymem keeps them, indexes them, and links them.
 
 ## Why
 
@@ -13,9 +13,9 @@ Most "knowledge base" tools want their own model key. That means a second bill, 
 second config file, and a second model that is often weaker than the agent asking
 the question.
 
-easywiki has no model inside it. **The agent on the other end of the MCP pipe is
+easymem has no model inside it. **The agent on the other end of the MCP pipe is
 the model.** It reads your files, decides what a page should say, and calls
-`wiki_write`. easywiki does the parts a model is bad at: full-text search, a link
+`wiki_write`. easymem does the parts a model is bad at: full-text search, a link
 graph, and knowing which source files changed since last time.
 
 It also has no native modules — three pure-JavaScript dependencies, nothing to
@@ -30,7 +30,7 @@ Add one block to your agent's MCP config. There is nothing else to set up.
 ```json
 {
   "mcpServers": {
-    "easywiki": { "command": "npx", "args": ["-y", "easywiki"] }
+    "easymem": { "command": "npx", "args": ["-y", "easymem"] }
   }
 }
 ```
@@ -38,9 +38,9 @@ Add one block to your agent's MCP config. There is nothing else to set up.
 **Codex** — `~/.codex/config.toml`:
 
 ```toml
-[mcp_servers.easywiki]
+[mcp_servers.easymem]
 command = "npx"
-args = ["-y", "easywiki"]
+args = ["-y", "easymem"]
 ```
 
 **opencode** — `opencode.json`:
@@ -48,13 +48,13 @@ args = ["-y", "easywiki"]
 ```json
 {
   "mcp": {
-    "easywiki": { "type": "local", "command": ["npx", "-y", "easywiki"], "enabled": true }
+    "easymem": { "type": "local", "command": ["npx", "-y", "easymem"], "enabled": true }
   }
 }
 ```
 
-Pages land in `.easywiki/wiki/` next to your code. Point somewhere else with
-`--dir <path>` or `EASYWIKI_DIR`.
+Pages land in `.easymem/wiki/` next to your code. Point somewhere else with
+`--dir <path>` or `EASYMEM_DIR`.
 
 ## Use
 
@@ -65,7 +65,7 @@ Just ask. The agent picks the tools by itself:
 > What do we already know about the checkout flow?
 
 The first run walks the files and writes pages. Later runs only touch what
-changed — easywiki hashes each source file, so unchanged files cost nothing.
+changed — easymem hashes each source file, so unchanged files cost nothing.
 
 ## Tools
 
@@ -90,7 +90,7 @@ it says *when* to reach for the wiki and hands the *how* straight back to
 ## What is on disk
 
 ```
-.easywiki/
+.easymem/
 ├── wiki/                     markdown pages — commit these
 │   ├── index.md              regenerated on every reindex
 │   ├── entities/             one concrete thing: a service, a table, a role
@@ -117,12 +117,12 @@ derive from the pages — plus a little scan bookkeeping. Delete `.state/` and t
 next run re-reads every source; nothing is lost but time.
 
 Pages are plain markdown with YAML frontmatter. Nothing is locked in — delete
-easywiki and you still have a folder of readable notes.
+easymem and you still have a folder of readable notes.
 
 Add to `.gitignore`:
 
 ```
-.easywiki/.state/
+.easymem/.state/
 ```
 
 ## Development
@@ -158,7 +158,7 @@ results got a lot better.
 
 It is also heavy — an LLM client, an HTTP API, a control panel, multi-tenant
 storage, a SQLite index. Sometimes you just want a small wiki to help the agent
-you already have. So easywiki lifts out the `MemoryKnowledge` engine — the mixed
+you already have. So easymem lifts out the `MemoryKnowledge` engine — the mixed
 Chinese/English tokenizer, the multi-hop graph search, the page format — and
 puts it behind an MCP interface. Nothing else.
 

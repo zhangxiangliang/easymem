@@ -1,7 +1,7 @@
 /**
  * In-memory BM25 index — the replacement for SQLite FTS5.
  *
- * The FTS5 table it replaces existed for a constraint easywiki does not have:
+ * The FTS5 table it replaces existed for a constraint easymem does not have:
  * the original service held ~300 wikis in one process and could not keep every
  * inverted index in memory. One wiki per process changes the arithmetic — a few
  * thousand pages of markdown is a few MB, so the index lives in a Map and is

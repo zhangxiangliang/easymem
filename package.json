@@ -1,11 +1,13 @@
 {
-  "name": "easywiki",
+  "name": "easymem",
   "version": "0.1.0",
-  "description": "A local LLM-wiki as an MCP server. The coding agent you already run does the writing; easywiki does the storage, full-text search and knowledge graph. No API key.",
+  "description": "A local LLM-wiki as an MCP server. The coding agent you already run does the writing; easymem does the storage, full-text search and knowledge graph. No API key.",
   "author": "zhangxiangliang",
   "keywords": [
     "mcp",
     "mcp-server",
+    "memory",
+    "agent-memory",
     "wiki",
     "llm-wiki",
     "knowledge-base",
@@ -21,15 +23,15 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zhangxiangliang/easywiki.git"
+    "url": "git+https://github.com/zhangxiangliang/easymem.git"
   },
-  "homepage": "https://github.com/zhangxiangliang/easywiki#readme",
-  "bugs": "https://github.com/zhangxiangliang/easywiki/issues",
+  "homepage": "https://github.com/zhangxiangliang/easymem#readme",
+  "bugs": "https://github.com/zhangxiangliang/easymem/issues",
   "type": "module",
   "main": "dist/mcp.js",
   "types": "dist/mcp.d.ts",
   "bin": {
-    "easywiki": "dist/cli.js"
+    "easymem": "dist/cli.js"
   },
   "exports": {
     ".": {

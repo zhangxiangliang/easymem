@@ -63,7 +63,7 @@ describe("readSources / writeSources", () => {
   let dir: string;
 
   beforeEach(() => {
-    dir = mkdtempSync(join(tmpdir(), "easywiki-sources-"));
+    dir = mkdtempSync(join(tmpdir(), "easymem-sources-"));
   });
 
   afterEach(() => {

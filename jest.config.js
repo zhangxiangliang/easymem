@@ -1,7 +1,7 @@
 /**
  * Jest, running native ESM.
  *
- * easywiki is a `"type": "module"` package, so three things are not optional:
+ * easymem is a `"type": "module"` package, so three things are not optional:
  *   - `extensionsToTreatAsEsm` — .ts files are ESM, not CommonJS.
  *   - `moduleNameMapper` — source files import `./slug.js` (required for a tsc
  *     ESM build); at test time that specifier has to resolve back to slug.ts.

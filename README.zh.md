@@ -1,19 +1,19 @@
-# easywiki
+# easymem
 
 [English](./README.md) · 简体中文
 
 给你的代码库配一个本地 wiki，以 **MCP server** 的形式提供。不要 API key，不上云，不用第二个模型。
 
 页面由你本来就在用的编码 agent 来写 —— Claude Code、Codex、opencode。
-easywiki 负责存下来、建索引、连成图。
+easymem 负责存下来、建索引、连成图。
 
 ## 为什么
 
 大部分「知识库」工具都要你再给它一个模型 key。这意味着第二份账单、第二份配置文件，
 以及一个往往比提问的那个 agent 还弱的模型。
 
-easywiki 里面没有模型。**MCP 管道另一端的 agent 就是模型。** 它读你的文件，
-判断一个页面该写什么，然后调用 `wiki_write`。easywiki 只做模型不擅长的那些事：
+easymem 里面没有模型。**MCP 管道另一端的 agent 就是模型。** 它读你的文件，
+判断一个页面该写什么，然后调用 `wiki_write`。easymem 只做模型不擅长的那些事：
 全文搜索、链接图，以及记住上次之后哪些源文件变了。
 
 它也没有 native 模块 —— 三个纯 JavaScript 依赖，没有任何东西需要编译。
@@ -28,7 +28,7 @@ easywiki 里面没有模型。**MCP 管道另一端的 agent 就是模型。** �
 ```json
 {
   "mcpServers": {
-    "easywiki": { "command": "npx", "args": ["-y", "easywiki"] }
+    "easymem": { "command": "npx", "args": ["-y", "easymem"] }
   }
 }
 ```
@@ -36,9 +36,9 @@ easywiki 里面没有模型。**MCP 管道另一端的 agent 就是模型。** �
 **Codex** —— `~/.codex/config.toml`：
 
 ```toml
-[mcp_servers.easywiki]
+[mcp_servers.easymem]
 command = "npx"
-args = ["-y", "easywiki"]
+args = ["-y", "easymem"]
 ```
 
 **opencode** —— `opencode.json`：
@@ -46,12 +46,12 @@ args = ["-y", "easywiki"]
 ```json
 {
   "mcp": {
-    "easywiki": { "type": "local", "command": ["npx", "-y", "easywiki"], "enabled": true }
+    "easymem": { "type": "local", "command": ["npx", "-y", "easymem"], "enabled": true }
   }
 }
 ```
 
-页面会落在代码旁边的 `.easywiki/wiki/`。想换个地方就用 `--dir <path>` 或 `EASYWIKI_DIR`。
+页面会落在代码旁边的 `.easymem/wiki/`。想换个地方就用 `--dir <path>` 或 `EASYMEM_DIR`。
 
 ## 用法
 
@@ -61,7 +61,7 @@ args = ["-y", "easywiki"]
 
 > 关于结算流程，我们已经知道些什么？
 
-第一次跑会走一遍文件、写页面。之后只碰变过的 —— easywiki 给每个源文件算了哈希，
+第一次跑会走一遍文件、写页面。之后只碰变过的 —— easymem 给每个源文件算了哈希，
 没变的文件不花任何成本。
 
 ## 工具
@@ -86,7 +86,7 @@ args = ["-y", "easywiki"]
 ## 磁盘上有什么
 
 ```
-.easywiki/
+.easymem/
 ├── wiki/                     markdown 页面 —— 这些要提交进 git
 │   ├── index.md              每次 reindex 重新生成
 │   ├── entities/             一个具体的东西：服务、表、角色
@@ -109,13 +109,13 @@ args = ["-y", "easywiki"]
 已完成文件的内容哈希 —— 这是唯一一个没办法从页面本身推导出来的事实 —— 外加一点
 扫描记账。把 `.state/` 删掉，下次运行会把所有源文件重读一遍，除了时间什么都不会丢。
 
-页面是带 YAML frontmatter 的纯 markdown。不存在任何锁定 —— 把 easywiki 删掉，
+页面是带 YAML frontmatter 的纯 markdown。不存在任何锁定 —— 把 easymem 删掉，
 你手里剩下的还是一个能直接读的笔记文件夹。
 
 加到 `.gitignore`：
 
 ```
-.easywiki/.state/
+.easymem/.state/
 ```
 
 ## 开发
@@ -149,7 +149,7 @@ markdown 页面组成的 wiki，之后从 wiki 里回答。
 
 它也确实很重 —— LLM 客户端、HTTP API、控制台、多租户存储、SQLite 索引。
 但有时候我们只是想要一个轻量的 wiki，帮一下手上已经有的那个 agent。
-所以 easywiki 把里面的 `MemoryKnowledge` 引擎抽了出来 —— 中英混合分词器、
+所以 easymem 把里面的 `MemoryKnowledge` 引擎抽了出来 —— 中英混合分词器、
 多跳图搜索、页面格式 —— 放到一个 MCP 接口后面。没有别的东西。
 
 MIT。TencentDB-Agent-Memory 也是 MIT。

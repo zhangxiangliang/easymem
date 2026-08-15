@@ -1,16 +1,16 @@
 /**
  * The ingest guide handed to the calling agent.
  *
- * easywiki has no model of its own. The agent that connects over MCP is the
+ * easymem has no model of its own. The agent that connects over MCP is the
  * model — it reads the source files, decides what a page should say, and calls
  * `wiki_write`. This text is the whole contract for that job, returned by the
  * `wiki_guide` tool so it works the same in Claude Code, Codex and opencode
  * without any per-client config file.
  */
 
-export const INGEST_GUIDE = `# easywiki — how to build the wiki
+export const INGEST_GUIDE = `# easymem — how to build the wiki
 
-You are the writer. easywiki only stores, indexes and links what you write.
+You are the writer. easymem only stores, indexes and links what you write.
 
 ## Workflow
 
