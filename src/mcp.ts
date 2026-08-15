@@ -1,7 +1,7 @@
 /**
  * easymem — MCP stdio server.
  *
- * One process, no HTTP, no API key. The wiki lives in a plain directory:
+ * One process, no HTTP, no model of its own. The wiki lives in a plain directory:
  * markdown pages under `<dir>/wiki/`, nothing else. The search index and the
  * link graph are built in memory at startup — there is no database file.
  *
