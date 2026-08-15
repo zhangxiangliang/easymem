@@ -43,13 +43,22 @@ const WIKI = "wiki";
 /** Scaffolding pages: real files, but not knowledge. Kept out of listings. */
 const STRUCTURAL_TYPES = new Set(["index", "purpose", "schema"]);
 
+/**
+ * Tool arguments arrive from the client unvalidated — a field declared as an
+ * array in the input schema can still turn up as a string. Anything that is not
+ * an array becomes an empty list rather than a crash mid tool call.
+ */
+function strArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.map(String) : [];
+}
+
 // ───────────────────────── tool definitions ─────────────────────────
 
 interface ToolDef {
   name: string;
   description: string;
   inputSchema: Record<string, unknown>;
-  run: (args: Record<string, any>, ctx: Ctx) => unknown;
+  run: (args: Record<string, unknown>, ctx: Ctx) => unknown;
 }
 
 interface Ctx {
@@ -165,7 +174,7 @@ const TOOLS: ToolDef[] = [
       required: ["paths"],
     },
     run: (a, ctx) => {
-      const paths: string[] = (a.paths ?? []).map(String);
+      const paths: string[] = strArray(a.paths);
       const disk: Array<{ filename: string; sha256: string }> = [];
       const unreadable: string[] = [];
       for (const p of paths) {
@@ -223,7 +232,7 @@ const TOOLS: ToolDef[] = [
           type,
           title,
           description: a.description ? String(a.description) : undefined,
-          sources: (a.sources ?? []).map(String),
+          sources: strArray(a.sources),
           timestamp: new Date().toISOString(),
         },
         String(a.body),
@@ -274,8 +283,8 @@ const TOOLS: ToolDef[] = [
       },
     },
     run: (a, ctx) => {
-      const ingested: string[] = (a.ingested ?? []).map(String);
-      const removed: string[] = (a.removed ?? []).map(String);
+      const ingested: string[] = strArray(a.ingested);
+      const removed: string[] = strArray(a.removed);
 
       const state = ctx.mgr.sync(WIKI); // rescan pages → rebuild FTS + graph
       if (state.status === "error") throw new Error(state.error ?? "reindex failed");
@@ -346,7 +355,7 @@ export function createEasywikiServer(dir: string, root: string): Server {
       return { content: [{ type: "text", text: `Unknown tool: ${name}` }], isError: true };
     }
     try {
-      const out = tool.run((args ?? {}) as Record<string, any>, ctx);
+      const out = tool.run((args ?? {}) as Record<string, unknown>, ctx);
       const text = typeof out === "string" ? out : JSON.stringify(out, null, 2);
       return { content: [{ type: "text", text: text || "(empty)" }], isError: false };
     } catch (err) {
