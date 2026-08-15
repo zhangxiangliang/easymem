@@ -1,0 +1,35 @@
+{
+  "name": "easywiki",
+  "version": "0.1.0",
+  "description": "A local LLM-wiki as an MCP server. The coding agent you already run does the writing; easywiki does the storage, full-text search and knowledge graph. No API key.",
+  "type": "module",
+  "bin": {
+    "easywiki": "./bin/easywiki.mjs"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "tsx src/mcp.ts",
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "graphology": "^0.26.0",
+    "yaml": "^2.8.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsdown": "^0.21.10",
+    "tsx": "^4.21.0",
+    "typescript": "^5.6.0"
+  },
+  "license": "MIT"
+}
