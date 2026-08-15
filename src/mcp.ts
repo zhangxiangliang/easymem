@@ -35,6 +35,7 @@ import { buildPage } from "./wiki/frontmatter.js";
 import { rebuildIndexFile } from "./wiki/index-builder.js";
 import { INGEST_GUIDE } from "./wiki/guide.js";
 import { createLogger } from "./logger.js";
+import { VERSION } from "./version.js";
 
 const log = createLogger("easymem");
 
@@ -337,7 +338,7 @@ export function createEasymemServer(dir: string, root: string): Server {
 
   const byName = new Map(TOOLS.map((t) => [t.name, t]));
   const server = new Server(
-    { name: "easymem", version: "0.1.0" },
+    { name: "easymem", version: VERSION },
     { capabilities: { tools: {} } },
   );
 
