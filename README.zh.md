@@ -78,19 +78,25 @@ args = ["-y", "easywiki"]
 | `wiki_delete` | 删一个页面 |
 | `wiki_reindex` | 重建索引、链接图和 `index.md` |
 
-`wiki_guide` 是这东西在每个客户端里表现都一样的原因：规则跟着工具返回值走，
-而不是放在 `SKILL.md` 或 `AGENTS.md` 里 —— 这些文件每个工具的叫法都不一样。
+`wiki_guide` 是这个 wiki 在每个客户端里都长成同一个形状的原因：写作规则跟着
+工具返回值走，而不是放在一个每个工具叫法都不同的配置文件里。包里确实带了一个
+`SKILL.md`，但它是故意写薄的 —— 它只说**什么时候**该想到 wiki，**怎么写**原样
+交还给 `wiki_guide`。
 
 ## 磁盘上有什么
 
 ```
 .easywiki/
-├── wiki/                  markdown 页面 —— 这些要提交进 git
-│   ├── index.md           每次 reindex 重新生成
-│   ├── entities/
-│   └── concepts/
+├── wiki/                     markdown 页面 —— 这些要提交进 git
+│   ├── index.md              每次 reindex 重新生成
+│   ├── entities/             一个具体的东西：服务、表、角色
+│   ├── concepts/             跨越多个东西的概念：流程、策略
+│   ├── sources/              每份源文档一个页面
+│   ├── comparisons/          X 和 Y 的对比
+│   └── synthesis/            从多个页面得出的结论
 └── .state/
-    └── sources.json       哪些文件已经处理过，按内容哈希记
+    ├── sources.json          哪些源文件已经处理过，按内容哈希记
+    └── wiki-sources.json     扫描状态记账
 ```
 
 就这些，没有数据库。
@@ -99,8 +105,9 @@ args = ["-y", "easywiki"]
 什么都不缓存，因为不需要：页面**就是**唯一的真相来源，1000 个页面重建大约 120 ms，
 5000 个 230 ms，查询是个位数毫秒。
 
-除了页面之外只有一样东西会写盘：`sources.json`，也就是让 `wiki_pending` 能跳过
-重复工作的那些内容哈希。这是唯一一个没办法从页面本身推导出来的事实。
+`wiki/` 之外没有任何东西是真相来源。`.state/` 里存的是让 `wiki_pending` 能跳过
+已完成文件的内容哈希 —— 这是唯一一个没办法从页面本身推导出来的事实 —— 外加一点
+扫描记账。把 `.state/` 删掉，下次运行会把所有源文件重读一遍，除了时间什么都不会丢。
 
 页面是带 YAML frontmatter 的纯 markdown。不存在任何锁定 —— 把 easywiki 删掉，
 你手里剩下的还是一个能直接读的笔记文件夹。
@@ -115,9 +122,11 @@ args = ["-y", "easywiki"]
 
 ```bash
 pnpm install
-pnpm typecheck
-pnpm build
-pnpm dev            # 通过 stdio 跑 MCP server
+pnpm dev            # 直接从 src 跑 MCP server，走 stdio
+pnpm lint
+pnpm test           # jest 单元测试，带覆盖率
+pnpm build          # tsc → dist/，dist/cli.js 就是发布的可执行文件
+pnpm ci             # build + typecheck + test，和 CI 跑的完全一样
 ```
 
 需要 Node 20 或更高版本。

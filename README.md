@@ -81,19 +81,26 @@ changed — easywiki hashes each source file, so unchanged files cost nothing.
 | `wiki_delete` | Delete one page |
 | `wiki_reindex` | Rebuild the index, the graph and `index.md` |
 
-`wiki_guide` is why this works the same in every client: the rules ride in a tool
-result, not in a `SKILL.md` or an `AGENTS.md` that each tool spells differently.
+`wiki_guide` is why the wiki comes out the same shape in every client: the
+writing rules ride in a tool result, not in a config file each tool spells
+differently. The package does ship a `SKILL.md`, and it is deliberately thin —
+it says *when* to reach for the wiki and hands the *how* straight back to
+`wiki_guide`.
 
 ## What is on disk
 
 ```
 .easywiki/
-├── wiki/                  markdown pages — commit these
-│   ├── index.md           regenerated on every reindex
-│   ├── entities/
-│   └── concepts/
+├── wiki/                     markdown pages — commit these
+│   ├── index.md              regenerated on every reindex
+│   ├── entities/             one concrete thing: a service, a table, a role
+│   ├── concepts/             an idea across things: a flow, a policy
+│   ├── sources/              one page per source document
+│   ├── comparisons/          X versus Y
+│   └── synthesis/            a conclusion drawn from several pages
 └── .state/
-    └── sources.json       which files are already done, by content hash
+    ├── sources.json          which source files are done, by content hash
+    └── wiki-sources.json     scan bookkeeping
 ```
 
 That is everything. There is no database.
@@ -104,9 +111,10 @@ nothing needs to be: the pages **are** the source of truth, and rebuilding is
 about 120 ms for 1,000 pages, 230 ms for 5,000. Queries run in single-digit
 milliseconds.
 
-Only one thing gets written besides the pages: `sources.json`, the content
-hashes that let `wiki_pending` skip work. That is the one fact you cannot derive
-from the pages themselves.
+Nothing outside `wiki/` is a source of truth. `.state/` holds the content hashes
+that let `wiki_pending` skip files it has already done — the one fact you cannot
+derive from the pages — plus a little scan bookkeeping. Delete `.state/` and the
+next run re-reads every source; nothing is lost but time.
 
 Pages are plain markdown with YAML frontmatter. Nothing is locked in — delete
 easywiki and you still have a folder of readable notes.
@@ -121,9 +129,11 @@ Add to `.gitignore`:
 
 ```bash
 pnpm install
-pnpm typecheck
-pnpm build
-pnpm dev            # runs the MCP server over stdio
+pnpm dev            # run the MCP server over stdio, straight from src
+pnpm lint
+pnpm test           # jest, unit tests with coverage
+pnpm build          # tsc → dist/; dist/cli.js is the published binary
+pnpm ci             # build + typecheck + test, the same thing CI runs
 ```
 
 Requires Node 20 or newer.

@@ -2,7 +2,8 @@
  * easywiki — MCP stdio server.
  *
  * One process, no HTTP, no API key. The wiki lives in a plain directory:
- * markdown pages under `<dir>/wiki/`, a SQLite index at `<dir>/index.db`.
+ * markdown pages under `<dir>/wiki/`, nothing else. The search index and the
+ * link graph are built in memory at startup — there is no database file.
  *
  *   easywiki [--dir <path>]        # or EASYWIKI_DIR
  *
@@ -62,7 +63,7 @@ interface ToolDef {
 }
 
 interface Ctx {
-  /** Wiki project root: holds `wiki/` (pages) and `index.db`. */
+  /** Wiki project root: holds `wiki/` (pages) and `.state/` (source hashes). */
   dir: string;
   /** Where relative source paths in wiki_pending / wiki_reindex resolve from. */
   root: string;
@@ -331,7 +332,7 @@ function parseDir(argv: string[]): string {
 
 export function createEasywikiServer(dir: string, root: string): Server {
   const mgr = createWikiSourceManager(join(dir, ".state"));
-  mgr.init({ name: WIKI, path: dir }); // creates wiki/ + index.db on first run, idempotent
+  mgr.init({ name: WIKI, path: dir }); // creates the wiki/ tree on first run, idempotent
   const ctx: Ctx = { dir, root, mgr };
 
   const byName = new Map(TOOLS.map((t) => [t.name, t]));
