@@ -83,11 +83,11 @@ export function emptyWikiHint(dir: string): string {
  *
  * Shipping it through the CLI rather than telling people to download it means
  * the file always matches the installed version, works offline, and cannot rot
- * against a URL. `../SKILL.md` resolves to the package root from both
- * dist/cli-args.js and src/ under tsx.
+ * against a URL. The path resolves to the package root from both
+ * dist/cli-args.js and src/ under tsx, since both sit one level below it.
  */
 export function readSkill(): string {
-  return readFileSync(new URL("../SKILL.md", import.meta.url), "utf-8");
+  return readFileSync(new URL("../skills/easy-llm-wiki/SKILL.md", import.meta.url), "utf-8");
 }
 
 /** Body text from --body, --body-file, or piped stdin. */

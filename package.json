@@ -1,7 +1,7 @@
 {
   "name": "easymem",
   "version": "0.4.0",
-  "description": "An LLM wiki your coding agent writes — agent memory you can open and read. The agent does the writing; easymem does the storage, full-text search and knowledge graph. No embedding model, no vector database.",
+  "description": "An LLM wiki your coding agent writes \u2014 agent memory you can open and read. The agent does the writing; easymem does the storage, full-text search and knowledge graph. No embedding model, no vector database.",
   "author": "zhangxiangliang",
   "keywords": [
     "mcp",
@@ -18,8 +18,8 @@
     "codex",
     "opencode",
     "ai",
-    "知识库",
-    "维基"
+    "\u77e5\u8bc6\u5e93",
+    "\u7ef4\u57fa"
   ],
   "repository": {
     "type": "git",
@@ -62,7 +62,7 @@
   "files": [
     "dist/**/*",
     "src/**/*",
-    "SKILL.md"
+    "skills/**/*"
   ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
