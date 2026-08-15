@@ -83,6 +83,7 @@ args = ["-y", "easymem"]
 | `easymem read` | `wiki_read` | 读一个页面 |
 | `easymem list` | `wiki_list` | 列出所有页面：id、标题、类型、路径 |
 | `easymem graph` | `wiki_graph` | 整张链接图 —— 找出枢纽页和孤儿页 |
+| `easymem lint` | `wiki_lint` | 找出 wiki 里已经不再成立的地方 |
 | `easymem guide` | `wiki_guide` | 写作规则，运行时直接交给 agent |
 | `easymem pending` | `wiki_pending` | 上次之后哪些源文件是新的或改过的 |
 | `easymem write` | `wiki_write` | 写一个页面 |
@@ -95,6 +96,29 @@ args = ["-y", "easymem"]
 工具返回值走，而不是放在一个每个工具叫法都不同的配置文件里。包里确实带了一个
 `SKILL.md`，但它是故意写薄的 —— 它只说**什么时候**该想到 wiki，**怎么写**原样
 交还给 `wiki_guide`。
+
+## 让它保持为真
+
+wiki 是派生数据，风险不在于它和源料重复，而在于**它会漂移**。过期的页面看不出过期：它读起来依然自信、依然像是当下的，而它描述的那个文件早就变了。
+
+```bash
+npx easymem lint
+```
+
+| 检查 | 含义 |
+| --- | --- |
+| `danglingLinks` | `[[链接]]` 后面没有页面 —— 要么写错了，要么这页该写 |
+| `orphans` | 没人链接到这里。通常是别处少了个链接，不是这页有问题 |
+| `missingSources` | 这页什么都没声明，任何断言都无法核对 |
+| `staleSources` | 声明的源文件没了，这页可能在描述一个不存在的东西 |
+| `outdated` | 声明的源文件**内容变了**，页面没跟上 |
+| `untracked` | 声明的源文件从没被 ingest 过，所以没有任何东西在盯着它 |
+| `missingLinks` | 正文里提到了另一个页面的名字，却没有链过去 |
+| `reviewForContradiction` | 出自同一份源文件的页面，值得放在一起读 |
+
+**`outdated` 是这里最值钱的一项。** 大多数工具做这件事是比时间戳 —— 你重新格式化一下文件，它就把所有引用该文件的页面全报一遍。easymem 已经为每个 ingest 过的源文件存了 sha256，所以它问的是精确的问题：**内容真的变了吗？**
+
+`reviewForContradiction` 返回的是**候选，不是结论**。两个页面完全可以从不同角度描述同一份文件而互不矛盾，判断这件事是判断 —— 那正是管道另一端那个 agent 的职责。**报一个假矛盾比一个都不报更糟**，因为被改写的那一页本来没错。
 
 ## 磁盘上有什么
 

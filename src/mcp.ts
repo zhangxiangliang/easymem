@@ -38,6 +38,7 @@ import {
 import { pageRelPath } from "./wiki/slug.js";
 import { buildPage, isLocked } from "./wiki/frontmatter.js";
 import { rebuildIndexFile } from "./wiki/index-builder.js";
+import { lint } from "./wiki/lint.js";
 import { INGEST_GUIDE } from "./wiki/guide.js";
 import { createLogger } from "./logger.js";
 import { VERSION } from "./version.js";
@@ -153,6 +154,20 @@ const TOOLS: ToolDef[] = [
       "an orphan usually means a missing [[link]], not a missing page.",
     inputSchema: { type: "object", properties: {} },
     run: (_a, ctx) => ctx.mgr.graph(WIKI),
+  },
+
+  {
+    name: "wiki_lint",
+    description:
+      "Find where the wiki has stopped being true: dangling links, orphan pages, pages with no " +
+      "sources, sources that are gone, and sources whose content changed since the page was " +
+      "written (compared by hash, not timestamp, so reformatting does not count). Also reports " +
+      "prose that names a page without linking it, and pairs of pages built from the same source. " +
+      "That last one is candidates to read, never a verdict — deciding whether two pages actually " +
+      "contradict each other is your job, and rewriting a page that was never wrong is worse than " +
+      "leaving it.",
+    inputSchema: { type: "object", properties: {} },
+    run: (_a, ctx) => lint(ctx.mgr.getPages(WIKI), readSources(ctx.dir), ctx.root),
   },
 
   {

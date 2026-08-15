@@ -114,6 +114,13 @@ export const COMMANDS: Command[] = [
     args: () => ({}),
   },
   {
+    name: "lint",
+    tool: "wiki_lint",
+    usage: "lint",
+    summary: "Find what has rotted: dead links, orphans, and pages their sources have outgrown.",
+    args: () => ({}),
+  },
+  {
     name: "pending",
     tool: "wiki_pending",
     usage: "pending <path>...",

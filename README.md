@@ -90,6 +90,7 @@ costs nothing.
 | `easymem read` | `wiki_read` | Read one page |
 | `easymem list` | `wiki_list` | Every page: id, title, type, path |
 | `easymem graph` | `wiki_graph` | The whole link graph — find hubs and orphans |
+| `easymem lint` | `wiki_lint` | Find where the wiki has stopped being true |
 | `easymem guide` | `wiki_guide` | The writing rules, handed to the agent at run time |
 | `easymem pending` | `wiki_pending` | Which source files are new or changed since last time |
 | `easymem write` | `wiki_write` | Write one page |
@@ -104,6 +105,38 @@ writing rules ride in a tool result, not in a config file each tool spells
 differently. The package does ship a `SKILL.md`, and it is thin on purpose —
 it says *when* to reach for the wiki and hands the *how* straight back to
 `wiki_guide`.
+
+## Keeping it true
+
+A wiki is derived data, and the risk is not that it duplicates the sources — it
+is that it drifts from them. Nothing about a stale page looks stale: it reads as
+confident and current while the file it describes has moved on.
+
+```bash
+npx easymem lint
+```
+
+| Check | What it means |
+| --- | --- |
+| `danglingLinks` | A `[[link]]` with no page behind it — a typo, or a page worth writing |
+| `orphans` | Nothing links here. Usually a missing link elsewhere, not a bad page |
+| `missingSources` | The page declares nothing, so no claim on it can be checked |
+| `staleSources` | A declared source is gone; the page may describe nothing |
+| `outdated` | A declared source **changed content** since the page was written |
+| `untracked` | A declared source was never ingested, so nothing watches it |
+| `missingLinks` | The page names another page in prose but never links it |
+| `reviewForContradiction` | Pages built from the same source, worth reading together |
+
+`outdated` is the one worth having. Most tools that try this compare
+timestamps, so reformatting a file reports every page that cites it. easymem
+already stores a sha256 per ingested source, so it asks the exact question: did
+the content change?
+
+`reviewForContradiction` returns **candidates, not findings**. Two pages can
+describe one file from different angles without disagreeing, and deciding that
+is a judgement — which is what the agent on the other end is for. Reporting a
+false contradiction is worse than reporting none, because the page that gets
+rewritten was never wrong.
 
 ## What is on disk
 

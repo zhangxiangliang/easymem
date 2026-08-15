@@ -61,6 +61,29 @@ npx easymem graph                                 # hubs to start from, orphans 
 the source has moved since. When a page and the file it cites disagree, believe
 the file, say so, and fix the page.
 
+To find those pages before they mislead someone:
+
+```bash
+npx easymem lint
+```
+
+- `outdated` — the source changed content since the page was written. Re-read
+  and reconcile. This is compared by hash, so it is a real edit, not a reformat.
+- `staleSources` — the source is gone. The page may describe nothing.
+- `danglingLinks` — a `[[link]]` with no page. A typo, or a page worth writing.
+- `orphans` — nothing links here. Usually a missing link elsewhere.
+- `missingSources` / `untracked` — the page cannot be checked, or nothing is
+  watching what it came from.
+- `missingLinks` — it names another page in prose without linking it. Adding the
+  link is what makes that page reachable by search.
+- `reviewForContradiction` — pages built from the same source. **Candidates, not
+  findings.** Read both before changing either: two pages can describe one file
+  from different angles without disagreeing, and rewriting a page that was never
+  wrong costs more than leaving the pair alone.
+
+Start with `summary` — it counts each category, so you can tell at a glance
+whether there is anything worth reading.
+
 ## Write when you learn something durable
 
 Durable means: still true next month, and expensive to work out again. An

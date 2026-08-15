@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { COMMANDS, commaList, help, parse, type Flags } from "../../src/cli-args.js";
+import { toolCatalog } from "../../src/mcp.js";
 
 /** Build the tool arguments a subcommand would send, straight from argv. */
 function argsFor(argv: string[]): Record<string, unknown> {
@@ -51,9 +52,10 @@ describe("commaList", () => {
 
 describe("every subcommand maps to a real tool", () => {
   // The CLI and the MCP server must expose the same behaviour; a subcommand
-  // pointing at a tool that does not exist would only fail at run time.
-  const toolNames = new Set(["wiki_search", "wiki_read", "wiki_list", "wiki_graph",
-    "wiki_guide", "wiki_pending", "wiki_write", "wiki_delete", "wiki_reindex"]);
+  // pointing at a tool that does not exist would only fail at run time. The
+  // list comes from the server itself rather than a copy here, so adding a tool
+  // cannot leave this check quietly out of date.
+  const toolNames = new Set(toolCatalog().map((t) => t.name));
 
   it.each(COMMANDS.map((c) => [c.name, c.tool]))("%s → %s", (_name, tool) => {
     expect(toolNames.has(tool as string)).toBe(true);
