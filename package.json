@@ -48,7 +48,9 @@
     "prepack": "pnpm run build",
     "dev": "tsx src/cli.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "ci": "pnpm run build && pnpm run typecheck"
+    "ci": "pnpm run build && pnpm run typecheck",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "files": [
     "dist/**/*"

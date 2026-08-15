@@ -60,6 +60,9 @@ export function tokenize(text: string): string[] {
     // real Chinese text actually uses; ASCII punctuation alone would leave a
     // whole clause glued together as a single token.
     .toLowerCase()
+    // `\[` is redundant inside a character class, but `\]` is not, and writing
+    // the pair symmetrically is what makes this readable as "both brackets".
+    // eslint-disable-next-line no-useless-escape
     .split(/[\s,，。！？、；：""''（）()\-_/\\·~～…\[\]【】{}《》<>]+/)
     .filter((t) => t.length > 0);
 

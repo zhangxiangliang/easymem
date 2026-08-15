@@ -410,8 +410,9 @@ export function createWikiSourceManager(dataDir: string): WikiSourceManager {
   function loadState() {
     if (!existsSync(stateFile)) return;
     try {
-      const raw = JSON.parse(readFileSync(stateFile, "utf-8"));
-      for (const [name, state] of Object.entries<any>(raw)) {
+      const raw: unknown = JSON.parse(readFileSync(stateFile, "utf-8"));
+      if (!raw || typeof raw !== "object") return;
+      for (const [name, state] of Object.entries(raw as Record<string, WikiSourceState>)) {
         if (state.status === "scanning") { state.status = "error"; state.error = "Restart"; }
         sources.set(name, state);
       }
@@ -589,12 +590,13 @@ export function createWikiSourceManager(dataDir: string): WikiSourceManager {
       // bare page id with no ".md" suffix.
       const cleanPath = relPath.replace(/^wiki\//, "");
       const base = join(state.path, "wiki");
-      let fullPath = join(base, cleanPath);
+      const fullPath = join(base, cleanPath);
       if (!fullPath.startsWith(base)) return null;
-      // Try the path as given, then with .md appended.
-      try { return readFileSync(fullPath, "utf-8"); } catch {}
+      // Try the path as given, then with .md appended. A miss is not an error:
+      // the caller asked for a page that may simply not exist.
+      try { return readFileSync(fullPath, "utf-8"); } catch { /* fall through */ }
       if (!cleanPath.endsWith(".md")) {
-        try { return readFileSync(fullPath + ".md", "utf-8"); } catch {}
+        try { return readFileSync(fullPath + ".md", "utf-8"); } catch { /* fall through */ }
       }
       return null;
     },
