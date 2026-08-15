@@ -34,13 +34,17 @@ npx easymem --help
 给 agent 装上 skill，它就知道什么时候该想到 wiki：
 
 ```bash
+npx skills add zhangxiangliang/easymem
+```
+
+走的是 [vercel-labs/skills](https://github.com/vercel-labs/skills)，它会自动
+识别你用的是哪个 agent，把文件放到对应的目录。不想多装一个工具的话，skill 文件
+本来就在包里：
+
+```bash
 mkdir -p .claude/skills/easymem
 npx easymem skill > .claude/skills/easymem/SKILL.md
 ```
-
-或者把这句话粘给 agent，让它自己装：
-
-> 运行 `npx easymem skill`，把输出保存到 `.claude/skills/easymem/SKILL.md`
 
 想接成 MCP server（索引常驻内存，长会话更划算），加上这段然后重启：
 

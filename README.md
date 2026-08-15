@@ -35,13 +35,17 @@ npx easymem --help
 Give your agent the skill, so it knows when to reach for the wiki:
 
 ```bash
+npx skills add zhangxiangliang/easymem
+```
+
+That goes through [vercel-labs/skills](https://github.com/vercel-labs/skills),
+which detects your agent and puts the file where that agent looks. The file also
+ships in the package, if you would rather not add a tool:
+
+```bash
 mkdir -p .claude/skills/easymem
 npx easymem skill > .claude/skills/easymem/SKILL.md
 ```
-
-Or paste this and let the agent do it:
-
-> Run `npx easymem skill` and save the output to `.claude/skills/easymem/SKILL.md`
 
 To run it as an MCP server instead — the index stays warm between calls — add
 this and restart:
