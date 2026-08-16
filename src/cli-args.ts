@@ -174,12 +174,12 @@ export const COMMANDS: Command[] = [
   {
     name: "pending",
     tool: "wiki_pending",
-    usage: "pending <path>...",
+    usage: "pending <path>... [--complete]",
     summary: "Which of these source files are new or changed since last time.",
     args: (rest, flags) => {
       const paths = rest.length ? rest : commaList(flags.get("paths"));
       if (!paths.length) throw new Error("pending needs at least one path");
-      return { paths };
+      return { paths, complete: flags.has("complete") };
     },
   },
   {

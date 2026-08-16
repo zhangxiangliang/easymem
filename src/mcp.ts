@@ -192,6 +192,13 @@ const TOOLS: ToolDef[] = [
           items: { type: "string" },
           description: "Source file paths, relative to the project root or absolute.",
         },
+        complete: {
+          type: "boolean",
+          description:
+            "Say true only when `paths` is every source the wiki covers. Without it, `deleted` " +
+            "stays empty — a partial list cannot tell a file that is gone from a file you did " +
+            "not mention.",
+        },
       },
       required: ["paths"],
     },
@@ -208,7 +215,25 @@ const TOOLS: ToolDef[] = [
         }
       }
       const { toIngest, skipped, deleted } = classifySources(disk, readSources(ctx.dir));
-      return { to_ingest: toIngest, skipped, deleted, unreadable };
+
+      // `deleted` is "recorded before, absent from the list you gave me" — not
+      // "gone from disk". Handing back a partial list made every unmentioned
+      // file look deleted, and the docs told the caller those pages were stale,
+      // which is an instruction to delete pages for files that still exist.
+      const complete = a.complete === true;
+      const result: Record<string, unknown> = {
+        to_ingest: toIngest,
+        skipped,
+        deleted: complete ? deleted : [],
+        unreadable,
+      };
+      if (!complete && deleted.length) {
+        result.note =
+          `${deleted.length} recorded source(s) were not in this list. They may simply be ` +
+          "outside it rather than gone, so they are not reported as deleted. Pass " +
+          "complete: true with the full source list if you want that checked.";
+      }
+      return result;
     },
   },
 
@@ -296,14 +321,17 @@ const TOOLS: ToolDef[] = [
     description:
       "Rebuild the search index, the link graph and wiki/index.md from the pages on disk. " +
       "Run it once after a batch of wiki_write calls — nothing you wrote is searchable until you do. " +
-      "Pass the source paths you finished so wiki_pending can skip them next time.",
+      "It records a hash for every source your pages declare, so wiki_pending can skip them next " +
+      "time; `ingested` is only needed for a source you read but wrote no page from.",
     inputSchema: {
       type: "object",
       properties: {
         ingested: {
           type: "array",
           items: { type: "string" },
-          description: "Source paths successfully turned into pages during this run.",
+          description:
+            "Extra source paths to record. Sources named in a page's frontmatter are picked up " +
+            "on their own — this is for a file you read that produced no page.",
         },
         removed: {
           type: "array",
@@ -313,7 +341,6 @@ const TOOLS: ToolDef[] = [
       },
     },
     run: (a, ctx) => {
-      const ingested: string[] = strArray(a.ingested);
       const removed: string[] = strArray(a.removed);
 
       const state = ctx.mgr.sync(WIKI); // rescan pages → rebuild FTS + graph
@@ -321,32 +348,50 @@ const TOOLS: ToolDef[] = [
 
       const entries = rebuildIndexFile(ctx.dir);
 
-      if (ingested.length || removed.length) {
-        const known: SourceMap = readSources(ctx.dir);
-        const now = new Date().toISOString();
-        for (const p of ingested) {
-          let content = "";
-          try {
-            content = readFileSync(resolve(ctx.root, p), "utf-8");
-          } catch {
-            continue; // vanished mid-run — leave it for the next wiki_pending
-          }
-          known[p] = {
-            sha256: sha256(content),
-            size: Buffer.byteLength(content, "utf-8"),
-            ingestedAt: now,
-          };
-        }
-        for (const p of removed) delete known[p];
-        writeSources(ctx.dir, known);
-      }
+      // Every source the pages themselves declare, plus anything the caller
+      // adds. Reading it off the pages is the point: the old version only
+      // recorded what was passed in, so a reindex with no arguments recorded
+      // nothing, wiki_pending kept reporting every file as new, and the whole
+      // incremental path quietly turned into a full re-read on every run. It
+      // returned success while doing so, which is the worst way to fail.
+      const declared = new Set<string>();
+      for (const page of ctx.mgr.getPages(WIKI)) for (const s of page.sources) declared.add(s);
+      for (const p of strArray(a.ingested)) declared.add(p);
 
-      return {
+      const known: SourceMap = readSources(ctx.dir);
+      const now = new Date().toISOString();
+      const recorded: string[] = [];
+      for (const p of declared) {
+        let content = "";
+        try {
+          content = readFileSync(resolve(ctx.root, p), "utf-8");
+        } catch {
+          continue; // gone or unreadable — leave it for wiki_pending to report
+        }
+        known[p] = {
+          sha256: sha256(content),
+          size: Buffer.byteLength(content, "utf-8"),
+          ingestedAt: now,
+        };
+        recorded.push(p);
+      }
+      for (const p of removed) delete known[p];
+      if (recorded.length || removed.length) writeSources(ctx.dir, known);
+
+      const result: Record<string, unknown> = {
         pages: state.pageCount ?? 0,
         index_entries: entries,
-        sources_recorded: ingested.length,
+        sources_recorded: recorded.length,
         sources_removed: removed.length,
       };
+      // Say it out loud rather than leaving a zero for someone to notice.
+      if (recorded.length === 0 && (state.pageCount ?? 0) > 0) {
+        result.warning =
+          "No sources recorded: no page declares a `sources` path that exists on disk. " +
+          "wiki_pending will keep reporting every file as new, so nothing will be skipped. " +
+          "Give each page the source paths it was written from.";
+      }
+      return result;
     },
   },
 ];

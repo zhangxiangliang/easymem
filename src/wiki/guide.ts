@@ -18,7 +18,10 @@ You are the writer. easymem only stores, indexes and links what you write.
 2. Call \`wiki_pending\` with those paths. It returns:
    - \`to_ingest\` — new or changed since last time. Work on these.
    - \`skipped\` — unchanged and already ingested. Do not re-read them.
-   - \`deleted\` — tracked before, gone from disk now. Their pages are stale.
+   - \`deleted\` — recorded before and missing now. **Only filled in when you pass
+     \`complete: true\` with the full source list**; a partial list cannot tell a
+     file that is gone from one you simply did not mention, and deleting pages on
+     that guess destroys good work.
 3. For each path in \`to_ingest\`: read the file, then call \`wiki_write\` once per
    distinct thing worth its own page. One source file often makes several pages.
 4. Call \`wiki_reindex\` once at the end, passing every path you finished.

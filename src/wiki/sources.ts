@@ -48,7 +48,10 @@ export function writeSources(wikiDir: string, map: SourceMap): void {
  * Compare the files on disk against what was recorded last run.
  * - `toIngest` — never seen, or the content hash moved.
  * - `skipped`  — recorded and unchanged; the agent can leave these alone.
- * - `deleted`  — recorded before, missing from the given file list now.
+ * - `deleted`  — recorded before, **absent from `disk`**. That only means gone
+ *   when `disk` is the complete source list; for a partial list it is just
+ *   "not mentioned this time", which is why the caller decides whether to
+ *   surface it.
  */
 export function classifySources(
   disk: Array<{ filename: string; sha256: string }>,

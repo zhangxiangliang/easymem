@@ -30,6 +30,7 @@ interface PendingResult {
   skipped: string[];
   deleted: string[];
   unreadable: string[];
+  note?: string;
 }
 
 describe("the wiki loop", () => {
@@ -185,6 +186,29 @@ describe("the wiki loop", () => {
     expect(graph.edges.length).toBeGreaterThan(0);
   });
 
+  it("records a source from the page that declares it, with no arguments", () => {
+    // The regression: writeSources only ran when the caller passed `ingested`,
+    // so a plain reindex recorded nothing, wiki_pending reported every file as
+    // new forever, and the incremental path silently became a full re-read —
+    // while reindex still returned success.
+    writeFileSync(join(root, "a.ts"), "export const a = 1;\n");
+    write("Alpha", "entity", "body", ["a.ts"]);
+
+    const out = call<{ sources_recorded: number; warning?: string }>("wiki_reindex", {});
+    expect(out.sources_recorded).toBe(1);
+    expect(out.warning).toBeUndefined();
+
+    const after = call<{ skipped: string[] }>("wiki_pending", { paths: ["a.ts"] });
+    expect(after.skipped).toEqual(["a.ts"]);
+  });
+
+  it("warns when pages exist but none of them names a source that is there", () => {
+    write("Alpha", "entity", "body");
+    const out = call<{ sources_recorded: number; warning?: string }>("wiki_reindex", {});
+    expect(out.sources_recorded).toBe(0);
+    expect(out.warning).toMatch(/No sources recorded/);
+  });
+
   it("hands the writing rules over as text", () => {
     expect(call<string>("wiki_guide")).toContain("wiki_write");
   });
@@ -223,9 +247,27 @@ describe("wiki_pending", () => {
     expect(pending(["a.ts"]).to_ingest).toEqual(["a.ts"]);
   });
 
-  it("reports a tracked file that is no longer on the list as deleted", () => {
+  it("reports a tracked file that is really gone, given the complete list", () => {
     runTool("wiki_reindex", { ingested: ["a.ts"] }, ctx);
-    expect(pending(["b.ts"]).deleted).toEqual(["a.ts"]);
+    const r = runTool("wiki_pending", { paths: ["b.ts"], complete: true }, ctx) as PendingResult;
+    expect(r.deleted).toEqual(["a.ts"]);
+  });
+
+  it("stays silent about deletion when it was handed a partial list", () => {
+    // `deleted` means "recorded before, not in the list you gave me". Reporting
+    // that for a partial list told the caller pages were stale for files that
+    // were sitting right there, and the documented next step was to delete them.
+    runTool("wiki_reindex", { ingested: ["a.ts", "b.ts"] }, ctx);
+    const partial = pending(["a.ts"]);
+    expect(partial.deleted).toEqual([]);
+    expect(String(partial.note)).toMatch(/not in this list/);
+  });
+
+  it("checks for deletion when the caller says the list is complete", () => {
+    runTool("wiki_reindex", { ingested: ["a.ts", "b.ts"] }, ctx);
+    const full = runTool("wiki_pending", { paths: ["a.ts"], complete: true }, ctx) as PendingResult;
+    expect(full.deleted).toEqual(["b.ts"]);
+    expect(full).not.toHaveProperty("note");
   });
 
   it("separates a path it cannot read from one that is simply new", () => {

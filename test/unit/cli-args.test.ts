@@ -121,11 +121,16 @@ describe("read and delete", () => {
 
 describe("pending", () => {
   it("takes paths as words", () => {
-    expect(argsFor(["pending", "a.ts", "b.ts"])).toEqual({ paths: ["a.ts", "b.ts"] });
+    expect(argsFor(["pending", "a.ts", "b.ts"])).toMatchObject({ paths: ["a.ts", "b.ts"] });
   });
 
   it("also accepts a comma list", () => {
-    expect(argsFor(["pending", "--paths", "a.ts,b.ts"])).toEqual({ paths: ["a.ts", "b.ts"] });
+    expect(argsFor(["pending", "--paths", "a.ts,b.ts"])).toMatchObject({ paths: ["a.ts", "b.ts"] });
+  });
+
+  it("only asks for a deletion check when told the list is complete", () => {
+    expect(argsFor(["pending", "a.ts"])).toMatchObject({ complete: false });
+    expect(argsFor(["pending", "a.ts", "--complete"])).toMatchObject({ complete: true });
   });
 
   it("refuses to run with no paths", () => {

@@ -118,8 +118,12 @@ npx easymem pending src/**/*.ts docs/*.md
 ```
 
 It answers with `to_ingest` (new or changed), `skipped` (already done and
-unchanged — **do not read these again**) and `deleted` (gone from disk, so their
-pages are stale).
+unchanged — **do not read these again**).
+
+`deleted` stays empty unless you pass `--complete` with the full source list. It
+means "recorded before and not in the list you gave me", which for a partial
+list is just "not mentioned" — acting on that would delete pages for files that
+are still there.
 
 Read each path in `to_ingest`, then `write` once per subject worth its own page.
 One source file often makes several pages.
