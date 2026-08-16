@@ -1,3 +1,10 @@
+## [0.4.1](https://github.com/zhangxiangliang/easymem/compare/v0.4.0...v0.4.1) (2026-08-16)
+
+
+### Bug Fixes
+
+* record source hashes on every reindex, and stop guessing at deletions ([8bc52e8](https://github.com/zhangxiangliang/easymem/commit/8bc52e8b93759ac9ee24ee428b13852e66b86ac7))
+
 # [0.4.0](https://github.com/zhangxiangliang/easymem/compare/v0.3.1...v0.4.0) (2026-08-15)
 
 
